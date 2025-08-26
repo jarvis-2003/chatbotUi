@@ -126,7 +126,7 @@ const chatbot = () => {
     // Build headers object
     let headers = {};
     if (sessionId) {
-        headers["session-id"] = sessionId; // <-- attach to headers
+        headers["session-id"] = sessionId;
     }
     console.log(headers);
     // chatarea.appendChild(addmessage("hii this is test"));
@@ -183,9 +183,72 @@ const chatbot = () => {
         const currentField = storedList[sessionStorage.getItem("progress")]["name"]?.toLowerCase();
         const userAnswer = inputarea.value.trim();
 
+        
+
+
+        if(conversationState === "need_otp")
+        {
+            fetch("http://127.0.0.1:8000/validateOtp",{
+                method: "GET",
+                headers:{
+                    "session-id":localStorage.getItem("session_id"),
+                    "otp":userAnswer
+                }
+            }).then(res => res.json()).then(data =>{
+                console.log(data)
+                if (data["status"])
+                {
+                    addBotmessage("Verified sucessfully !! Thank you",chatarea,2000).then(()=>{
+                    conversationState = "normal"
+                    // normal question flow begins:
+                    sessionStorage.setItem("progress", QuestionProgress += 1);
+                    if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
+                        addBotmessage(chatStartEnd[1], chatarea, 2000)
+                    } else {
+                        if (storedList[sessionStorage.getItem("progress")]["options"]) {
+
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
+                            })
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+
+                            inputarea.placeholder = `Please input your ${storedList[sessionStorage.getItem("progress")]["name"].toLowerCase()}`
+                            outerInput.style.display = "none";
+                        }else{
+                            outerInput.style.display = "grid"
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+                            let inputname = storedList[sessionStorage.getItem("progress")]["name"] ? storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "answer"
+                            inputarea.placeholder = `Please input your ${inputname}`;
+
+                        }
+                    }
+                    }
+                        
+
+                    )
+
+
+                }else{
+                    addBotmessage("❌ Invalid OTP , please try again",chatarea,2000)
+                }
+            });
+            return;
+        }
+
 
 
         if (userAnswer != "") {
+            
+            addUsermessage(userAnswer, chatarea);
 
           if (currentField === "name") {
                 if (!isValidName(userAnswer)) {
@@ -194,18 +257,51 @@ const chatbot = () => {
                 }
             }
 
-            if (currentField === "phone") {
+            if (currentField === "phone" && conversationState == "normal") {
                 if (!isValidPhone(userAnswer)) {
                     addBotmessage("📞 Please enter a valid 10-digit phone number.", chatarea);
                     return;
                 }
+                fetch("http://127.0.0.1:8000/otpgen" ,
+                    {
+                        method: "POST",
+                        headers:{"Content-Type" : "application/json"},
+                        body:JSON.stringify({
+                            "session_id" : localStorage.getItem("session_id"),
+                            "phone" : userAnswer
+                        })
+                    }
+                ).then(res => res.json()).then(data => {
+                    console.log(data)
+                    addBotmessage(`We have sent an otp to ${userAnswer}.Please enter it below `,chatarea,2000);
+                    inputarea.value = "";
+                    inputarea.focus();
+                    conversationState = "need_otp";
+                })
+                return;
             }
 
-            if (currentField === "email") {
+            if (currentField === "email" && conversationState == "normal") {
                 if (!isValidEmail(userAnswer)) {
                     addBotmessage("✉️ Please enter a valid email address.", chatarea);
                     return;
                 }
+                fetch("http://127.0.0.1:8000/otpgen" ,
+                    {
+                        method: "POST",
+                        headers:{"Content-Type" : "application/json"},
+                        body:JSON.stringify({
+                            "session_id" : localStorage.getItem("session_id"),
+                            "email" : userAnswer
+                        })
+                    }
+                ).then(res => res.json()).then(data => {
+                            addBotmessage(`We have sent an otp to ${userAnswer}.Please enter it below `,chatarea,2000)
+                            inputarea.value = "";
+                            inputarea.focus();
+                            conversationState = "need_otp";
+                        })
+                return;
             }
 
             if (currentField === "budget") {
@@ -217,7 +313,7 @@ const chatbot = () => {
                 }
             }
 
-            addUsermessage(userAnswer, chatarea);
+            
 
             if (conversationState === "need_city") {
                 let matchflag = false;
@@ -286,6 +382,9 @@ const chatbot = () => {
                     }).then(r => r.json()).then(suggestions => {
                         if (suggestions["expected_cities"].length > 0) {
                             addBotmessage(`take one from ${suggestions["expected_cities"]}`, chatarea, 1000)
+                            // conversationState = "normal";
+                            // pendingCityOptions = [];
+                            // pendingstate = "";
                         } else {
                             addBotmessage("Sorry unable to find any cities to your match", chatarea, 1000);
                             let reqoptionlist = "";
@@ -293,9 +392,7 @@ const chatbot = () => {
                                 reqoptionlist += city + "<br>";
                             })
                             addBotmessage(` Here the city list : <br> ${reqoptionlist} Try again from these.`, chatarea, 1000)
-                            conversationState = "normal";
-                            pendingCityOptions = [];
-                            pendingstate = "";
+                            return;
                         }
                     })
 
