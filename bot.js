@@ -168,6 +168,25 @@ const chatbot = () => {
             });
             return;
         }
+        if(conversationState == "need_Discount"){
+            pendingCityOptions.push(userAnswer);
+            safeFetch("http://127.0.0.1:8000/save-answer",{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        session_id: localStorage.getItem("session_id"),
+                        name: storedList[sessionStorage.getItem("progress")]["name"],
+                        answer: pendingCityOptions
+                    })
+                }).then((data)=>{
+                    pendingCityOptions = []
+                    addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
+                })
+
+        }
+
         if (userAnswer != "") {
 
         addUsermessage(userAnswer, chatarea);
@@ -251,6 +270,21 @@ const chatbot = () => {
                 }
             }
 
+            if (currentField === "onetimesettlement"){
+                if (userAnswer.toLowerCase() === "yes"){
+                    console.log("hii i am here")
+                  pendingCityOptions.push(userAnswer);
+                  conversationState = "need_Discount";
+                  addBotmessage("Please Do select a Dicount percent you want ?",chatarea,2000).then(()=>{
+                    addOptions(["10%","20%","30%"], chatarea, inputarea, inputButton);
+                  })
+                  return;
+                }else{
+                    addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
+                    return;
+                }
+            }
+
             if(storedList[sessionStorage.getItem("progress")]["name"] != null && conversationState == "normal") {
                 safeFetch("http://127.0.0.1:8000/save-answer", {
                     method: "POST",
@@ -263,6 +297,7 @@ const chatbot = () => {
                         answer: inputarea.value
                     })
                 }).then(data => {
+
 
                     if(data.status == "need_city") {
                         pendingCityOptions = data.optionsAndanswer["city_options"];
