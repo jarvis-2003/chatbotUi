@@ -103,10 +103,12 @@ const chatbot = () => {
                 localStorage.setItem("session_id", questions.session_id);
                 sessionId = questions.session_id;
             }
-        }).catch(err => console.error("Error fetching questions:", err));
+        })
+        .catch(err => console.error("Error fetching questions:", err));
     // Starting the Chat now;
 
     const storedList = JSON.parse(localStorage.getItem("questionlist"));
+
     let QuestionProgress = 0;
     sessionStorage.setItem("progress", QuestionProgress);
     let lengthOfQUestions = storedList.length;
@@ -158,8 +160,41 @@ const chatbot = () => {
                     addBotmessage("Verified sucessfully !! Thank you",chatarea,2000).then(()=>{
                     conversationState = "normal"
                     // normal question flow begins:
-                    addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton)
-                    })
+                    inputarea.value = ""
+                    sessionStorage.setItem("progress", QuestionProgress += 1);
+                    if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
+                        addBotmessage(chatStartEnd[1], chatarea, 2000)
+                    } else {
+                        if (storedList[sessionStorage.getItem("progress")]["options"]) {
+
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
+                            })
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+
+                            inputarea.placeholder = `Please input your ${storedList[sessionStorage.getItem("progress")]["name"].toLowerCase()}`
+                            outerInput.style.display = "none";
+                        }else{
+                            outerInput.style.display = "grid"
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+                            let inputname = storedList[sessionStorage.getItem("progress")]["name"] ? storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "answer"
+                            inputarea.placeholder = `Please input your ${inputname}`;
+
+                        }
+                    }
+                    }
+                        
+
+                    )
 
 
                 }else{
@@ -168,6 +203,9 @@ const chatbot = () => {
             });
             return;
         }
+
+
+
         if (userAnswer != "") {
 
         addUsermessage(userAnswer, chatarea);
@@ -203,9 +241,55 @@ const chatbot = () => {
                     }else{
                     conversationState = "normal";
                     addBotmessage("✅ Phone already verified. Skipping OTP.", chatarea, 1000).then(()=>{
-                        addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
+                    inputarea.value = "";
+                    sessionStorage.setItem("progress", QuestionProgress += 1);
+                    console.log(sessionStorage.getItem("progress"));
+                    console.log(lengthOfQUestions)
+
+                    if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
+
+                        addBotmessage(chatStartEnd[1], chatarea, 2000)
+                    } else {
+
+                        if (storedList[sessionStorage.getItem("progress")]["options"]) {
+
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
+                            })
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+
+                            inputarea.placeholder = `Please input your ${storedList[sessionStorage.getItem("progress")]["name"].toLowerCase()}`
+                            outerInput.style.display = "none";
+                        } else if (storedList[parseInt(sessionStorage.getItem("progress"))]["name"] === "Budget") {
+                            outerInput.style.display = "grid";
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addbudgetslidebar(chatarea, inputarea);
+                            })
+
+                        }else {
+                            outerInput.style.display = "grid"
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+                            let inputname = storedList[sessionStorage.getItem("progress")]["name"] ? storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "answer"
+                            inputarea.placeholder = `Please input your ${inputname}`;
+
+                        }
+
+
+                    }
+
                     })
                     }
+
                 })
                 return;
             }
@@ -234,7 +318,52 @@ const chatbot = () => {
                     }else{
                     conversationState = "normal";
                     addBotmessage("✅ email already verified. Skipping OTP.", chatarea, 1000).then(()=>{
-                        addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
+                    inputarea.value = "";
+                    sessionStorage.setItem("progress", QuestionProgress += 1);
+                    console.log(sessionStorage.getItem("progress"));
+                    console.log(lengthOfQUestions)
+
+                    if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
+
+                        addBotmessage(chatStartEnd[1], chatarea, 2000)
+                    } else {
+
+                        if (storedList[sessionStorage.getItem("progress")]["options"]) {
+
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
+                            })
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+
+                            inputarea.placeholder = `Please input your ${storedList[sessionStorage.getItem("progress")]["name"].toLowerCase()}`
+                            outerInput.style.display = "none";
+                        } else if (storedList[parseInt(sessionStorage.getItem("progress"))]["name"] === "Budget") {
+                            outerInput.style.display = "grid";
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addbudgetslidebar(chatarea, inputarea);
+                            })
+
+                        }else {
+                            outerInput.style.display = "grid"
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+                            let inputname = storedList[sessionStorage.getItem("progress")]["name"] ? storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "answer"
+                            inputarea.placeholder = `Please input your ${inputname}`;
+
+                        }
+
+
+                    }
+
                     })
                     }
 
@@ -285,7 +414,40 @@ const chatbot = () => {
                         }).then(data => console.log(data));
 
                         pendingCityOptions = []
-                        addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
+
+                        inputarea.value = ""
+
+                        sessionStorage.setItem("progress", QuestionProgress += 1);
+                    if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
+                        addBotmessage(chatStartEnd[1], chatarea, 2000)
+                    } else {
+                        if (storedList[sessionStorage.getItem("progress")]["options"]) {
+
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
+                            })
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+
+                            inputarea.placeholder = `Please input your ${storedList[sessionStorage.getItem("progress")]["name"].toLowerCase()}`
+                            outerInput.style.display = "none";
+                        }else{
+                            outerInput.style.display = "grid"
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+                            let inputname = storedList[sessionStorage.getItem("progress")]["name"] ? storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "answer"
+                            inputarea.placeholder = `Please input your ${inputname}`;
+
+                        }
+                        return;
+                    }
                 } else {
                     safeFetch("http://127.0.0.1:8000/rapidfuzzy", {
                         method: "POST",
@@ -322,19 +484,115 @@ const chatbot = () => {
                     if (document.getElementById("remove-Budget")) {
                         document.getElementById("remove-Budget").remove();
                     }
-                    addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
+                    inputarea.value = "";
+
+                    
+                    sessionStorage.setItem("progress", QuestionProgress += 1);
+                    console.log(sessionStorage.getItem("progress"));
+                    console.log(lengthOfQUestions)
+
+                    if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
+
+                        addBotmessage(chatStartEnd[1], chatarea, 2000)
+                    } else {
+                        if (storedList[sessionStorage.getItem("progress")]["options"]) {
+
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
+                            })
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+
+                            inputarea.placeholder = `Please input your ${storedList[sessionStorage.getItem("progress")]["name"].toLowerCase()}`
+                            outerInput.style.display = "none";
+                        } else if (storedList[parseInt(sessionStorage.getItem("progress"))]["name"] === "Budget") {
+                            outerInput.style.display = "grid";
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addbudgetslidebar(chatarea, inputarea);
+                            })
+
+                        }else {
+                            outerInput.style.display = "grid"
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+                            let inputname = storedList[sessionStorage.getItem("progress")]["name"] ? storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "answer"
+                            inputarea.placeholder = `Please input your ${inputname}`;
+
+                        }
+
+
+                    }
+
                 }
 
                 })
             }else{
+
                     if (document.getElementById("remove-Budget")) {
                         document.getElementById("remove-Budget").remove();
                     }
-                    addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
+                    inputarea.value = "";
+
+                    
+                    sessionStorage.setItem("progress", QuestionProgress += 1);
+                    console.log(sessionStorage.getItem("progress"));
+                    console.log(lengthOfQUestions)
+
+                    if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
+
+                        addBotmessage(chatStartEnd[1], chatarea, 2000)
+                    } else {
+                        if (storedList[sessionStorage.getItem("progress")]["options"]) {
+
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
+                            })
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+
+                            inputarea.placeholder = `Please input your ${storedList[sessionStorage.getItem("progress")]["name"].toLowerCase()}`
+                            outerInput.style.display = "none";
+                        } else if (storedList[parseInt(sessionStorage.getItem("progress"))]["name"] === "Budget") {
+                            outerInput.style.display = "grid";
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
+                                addbudgetslidebar(chatarea, inputarea);
+                            })
+
+                        }else {
+                            outerInput.style.display = "grid"
+                            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
+                            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
+                            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
+                            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
+                                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() :
+                                "null";
+                            let inputname = storedList[sessionStorage.getItem("progress")]["name"] ? storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "answer"
+                            inputarea.placeholder = `Please input your ${inputname}`;
+
+                        }
+
+
+                    }
 
                 }
+
         }
+
+
     })
+
 
 } //bot functions ends here !!
 
@@ -383,7 +641,7 @@ function addUsermessage(message, chatarea) {
     chatarea.appendChild(outermessagebox);
 }
 
-function addOptions(optionsarray, chatarea, inputbox, inputButton) {
+function addOptions(optionsarray, chatarea, inputbox, inputbtn) {
     let outerdiv = document.createElement("div");
     outerdiv.classList.add("options-out");
 
@@ -395,7 +653,7 @@ function addOptions(optionsarray, chatarea, inputbox, inputButton) {
 
         spanele.addEventListener("click", () => {
             inputbox.value = spanele.innerText;
-            inputButton.click();
+            inputbtn.click();
             outerdiv.remove();
         })
 
@@ -503,51 +761,6 @@ const resetEverything = (chatarea)=>{
     sessionStorage.removeItem("progress");
     chatarea.innerHTML = "";
     chatbot();
-}
-
-function addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton){
-    inputarea.value = "";
-    let QuestionProgress = parseInt(sessionStorage.getItem("progress"))
-    QuestionProgress = QuestionProgress + 1;
-    sessionStorage.setItem("progress", QuestionProgress);
-    let lengthOfQUestions = storedList.length;
-    console.log(sessionStorage.getItem("progress"));
-     if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
-        addBotmessage(chatStartEnd[1], chatarea, 2000).then(()=>{
-            inputarea.style = "none"
-        })
-    }else{
-        if ((storedList[sessionStorage.getItem("progress")]["options"])) {
-            let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
-            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
-                addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
-            })
-            inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
-            inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
-            storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "null";
-            inputarea.placeholder = `Please input your ${storedList[sessionStorage.getItem("progress")]["name"].toLowerCase()}`
-            outerInput.style.display = "none";
-            } else if(storedList[parseInt(sessionStorage.getItem("progress"))]["name"] === "Budget"){
-                outerInput.style.display = "grid";
-                let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
-                addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
-                addbudgetslidebar(chatarea, inputarea);
-                })
-            }else{
-                outerInput.style.display = "grid"
-                let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
-                addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
-                inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
-                inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
-                storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "null";
-                let inputname = storedList[sessionStorage.getItem("progress")]["name"] ? storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "answer"
-                inputarea.placeholder = `Please input your ${inputname}`;
-
-            }
-    }
-
-
-
 }
 
 chatbot();
