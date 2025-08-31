@@ -1,18 +1,14 @@
-body{
-    height: 100vh;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/*   */
 .chat-con {
+  position: absolute;
+  right: 0;
+  bottom: 80px;
   height: 70vh;
-  width: 30vw;
+  width: 25vw;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  margin: 20px;
+  /* margin: 20px; */
+  margin-right: 70px;
 }
 
 .chat-header {
@@ -271,3 +267,22 @@ body{
   display: none !important;
 }
 
+#float-bot > img{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 9999;
+
+  /* smooth hover animation */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover Effect */
+#float-bot > img:hover {
+  transform: scale(1.1) rotate(5deg); /* zoom + slight tilt */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* glowing shadow */
+}

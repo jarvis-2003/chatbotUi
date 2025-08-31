@@ -521,7 +521,7 @@ async function safeFetch(url , options = {},chatarea) {
         return await response.json();
     }catch(err){
         console.log("API Error",err);
-        addBotmessage("⚠️ Server is unavailable right now. Please reload or try again later.", chatarea, 2000);
+        addBotmessage("⚠️ Server error or Session timed out. Please reload or try again later.", chatarea, 2000);
         
         if(confirm("The server is down or restarting. Do you want to restart the chatbot?"))
         {
@@ -585,4 +585,54 @@ function addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton){
 
 }
 
-chatbot();
+// chatbot();
+// chatbot();
+
+// making it just an small icon in the page:
+// let bot = document.createElement("div")
+// bot.id = "float-bot";
+// let botImage = document.createElement("img");
+// botImage.src = `./images/bot-float.png`
+// botImage.setAttribute("class","bot-image");
+// bot.appendChild(botImage);
+// document.body.append(bot);
+// let counter = 0;
+// bot.addEventListener("click",()=>{
+// let botOuter = document.getElementById("chatbot-container");
+// console.log(counter)
+//     if(counter == 0){
+
+//         botOuter.style.display = "grid"
+//         counter++;
+//     }
+//     else if(counter == 1){  
+//         botOuter.style.display = "None"
+//         counter--;
+//     }
+// })
+
+
+// create floating bot icon
+let bot = document.createElement("div");
+bot.id = "float-bot";
+let botImage = document.createElement("img");
+botImage.src = `./images/bot-float.png`;
+botImage.setAttribute("class","bot-image");
+bot.appendChild(botImage);
+document.body.append(bot);
+
+let isOpen = false;
+
+bot.addEventListener("click", () => {
+    let botOuter = document.getElementById("chatbot-container");
+
+    if (!isOpen) {
+        if (botOuter) botOuter.remove();
+        chatbot();
+        isOpen = true;
+    } else {
+        if (botOuter) botOuter.remove();
+        isOpen = false;
+    }
+});
+
