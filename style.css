@@ -24,6 +24,13 @@
   color: aliceblue;
   border-radius: 30px 30px 0px 30px;
 }
+.cross-button{
+  position:absolute;
+  right: 0;
+  left:30px;
+  font-family: 'Courier New', Courier, monospace !important;
+  display: none;
+}
 
 .chat-area {
   background-color: #ECF0F1;
@@ -182,6 +189,29 @@
   display: block !important;
   scroll-behavior: smooth;
 }
+
+
+#float-bot > img{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 9999;
+
+  /* smooth hover animation */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover Effect */
+#float-bot > img:hover {
+  transform: scale(1.1) rotate(5deg); /* zoom + slight tilt */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* glowing shadow */
+}
+
+
 /* Tablet screens */
 @media (max-width: 1024px) {
   .chat-con {
@@ -192,15 +222,23 @@
 
 /* Mobile screens */
 @media (max-width: 768px) {
-  .chat-con {
-    width: 90vw;
-    height: 80vh;
-  }
+.chat-con {
+  position: fixed;    /* make it fixed so it covers the viewport */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;  
+  height: 100vh;      
+  margin: 0;      
+  border-radius: 0;
+  z-index: 9999;
+}
 
   .chat-header {
     font-size: 18px;
     padding: 8px;
-    border-radius: 20px 20px 0 20px;
+    border-radius: 0;
   }
 
   .bot-message, 
@@ -214,17 +252,33 @@
     width: 45px;
     font-size: medium;
   }
+  .cross-button {
+  display: block; /* show cross on mobile */
+  position: absolute;
+  /* top: 10px; */
+  left: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
 }
 
 
 
 /* Extra small devices */
 @media (max-width: 480px) {
-  .chat-con {
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0; /* full screen */
-  }
+.chat-con {
+  position: fixed;    /* make it fixed so it covers the viewport */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;  
+  height: 100vh;      
+  margin: 0;      
+  border-radius: 0;
+  z-index: 9999;
+}
 
   .chat-header {
     font-size: 16px;
@@ -245,6 +299,15 @@
     font-size: 12px;
     padding: 5px 8px;
   }
+.cross-button {
+  display: block; /* show cross on mobile */
+  position: absolute;
+  /* top: 10px; */
+  left: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
 }
 
 /* Override slider track */
@@ -272,22 +335,3 @@
   display: none !important;
 }
 
-#float-bot > img{
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  height: 60px;
-  width: 60px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 9999;
-
-  /* smooth hover animation */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Hover Effect */
-#float-bot > img:hover {
-  transform: scale(1.1) rotate(5deg); /* zoom + slight tilt */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* glowing shadow */
-}

@@ -54,6 +54,11 @@ const chatbot = () => {
     innerCon.innerText = "Chat Bot";
     outerContainer.appendChild(innerCon);
 
+    const crossbutton = document.createElement("div");
+    crossbutton.classList.add("cross-button")
+    crossbutton.innerHTML = `<span>✖<span>`;
+    innerCon.appendChild(crossbutton);
+
     // Chat area
     const chatarea = document.createElement("div");
     chatarea.classList.add("chat-area");
@@ -670,18 +675,42 @@ botImage.setAttribute("class","bot-image");
 bot.appendChild(botImage);
 document.body.append(bot);
 
+
 let isOpen = false;
 
 bot.addEventListener("click", () => {
     let botOuter = document.getElementById("chatbot-container");
 
-    if (!isOpen) {
-        if (botOuter) botOuter.remove();
-        chatbot();
+    // check screen size
+    if (window.innerWidth <= 480 || window.innerWidth <= 768) {
+        // mobile behavior
+        bot.style.display = "none";
+        if (!botOuter) chatbot();
+        let chat = document.getElementById("chatbot-container");
+        chat.style.display = "grid";
+
+        // show cross button
+        let cross = chat.querySelector(".cross-button");
+        cross.style.display = "block";
+
+        cross.onclick = () => {
+            chat.remove();
+            bot.style.display = "block";
+            isOpen = false;
+        }
+
         isOpen = true;
     } else {
-        if (botOuter) botOuter.remove();
-        isOpen = false;
+        if (!isOpen) {
+            console.log("hii")
+            if (botOuter) botOuter.remove();
+            chatbot();
+            isOpen = true;
+        } else {
+            if (botOuter) botOuter.remove();
+            isOpen = false;
+        }
     }
 });
+
 
