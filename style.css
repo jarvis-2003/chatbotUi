@@ -233,6 +233,8 @@
   margin: 0;      
   border-radius: 0;
   z-index: 9999;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
 
   .chat-header {
@@ -278,6 +280,8 @@
   margin: 0;      
   border-radius: 0;
   z-index: 9999;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
 
   .chat-header {
