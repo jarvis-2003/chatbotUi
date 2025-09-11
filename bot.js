@@ -27,7 +27,7 @@ const acknowledgements = [
 ];
 const chatStartEnd = ["Do you need assistance with property matters? I’m here to help you. Let’s begin by getting to know each other so I can better understand your needs.", "Thanks for sharing your details. Based on your responses, I’ll prepare a list of properties that best suit your needs. Generating your PDF report now."]
 let conversationState = "normal"
-const apiUrl = "http://127.0.0.1:8000"
+const apiUrl = "https://chatbotapi-b3wc.onrender.com"
 const chatbot = () => {
     const outerContainer = document.createElement("div");
     outerContainer.id = 'chatbot-container';
