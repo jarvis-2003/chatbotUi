@@ -1,47 +1,33 @@
-const apiUserKey = "USER84D2AC659F4ED57AC34EDF9A41897"
 const acknowledgements = [
-    "Got it 👍",
-    "Alright, noted ✅",
-    "Thanks for sharing 🙌",
-    "Perfect, moving on 👉",
-    "Understood 👌",
-    "Okay, got that!",
-    "Noted ✍️",
-    "Alright, thanks!",
-    "Cool, next question ➡️",
-    "Thanks, let’s continue 🚀",
-    "Okay, I hear you 👂",
-    "Great, got your response 🌟",
-    "Perfect, let’s go on →",
-    "Awesome, noted!",
-    "Okay, logging that 📝",
-    "Good, moving forward ➡️",
-    "Nice, got it!",
-    "That works, let’s proceed ⏩",
-    "Great, thanks for answering 🙏",
-    "Okay, understood 🤝",
-    "Perfect, thank you!",
-    "Alright, let’s move ahead ⬆️",
-    "Thanks, noted for now 🗒️",
-    "Got your input ✔️",
-    "Cool, proceeding!",
-    "Okay, makes sense 👍",
-    "Noted, moving on...",
-    "Alright, all set ✅",
-    "Good to know 👌",
-    "Perfectly noted 🎯",
-    "Thanks, continuing ➡️",
-    "Alright, let’s keep going 🔄",
-    "Gotcha 👊",
-    "All clear, moving forward 🌐",
-    "Okay, thanks a lot 🙏",
-    "Noted with thanks 🖊️",
-    "Great input, moving ahead 🏃",
-    "Cool, next up!",
-    "Perfect, let’s go 🚦",
-    "Alright, I’ve got that saved 🗂️"
+  "Acknowledged.",
+  "Noted.",
+  "Thank you for your response.",
+  "Understood.",
+  "Your input has been recorded.",
+  "Appreciate your response.",
+  "Information received.",
+  "Thank you, proceeding further.",
+  "Got it, moving ahead.",
+  "Your response is noted.",
+  "Confirmed.",
+  "Thank you, continuing.",
+  "I have documented your input.",
+  "Acknowledged, moving forward.",
+  "Your answer has been saved.",
+  "Input successfully recorded.",
+  "Thank you for sharing.",
+  "Message received.",
+  "Noted, let’s continue.",
+  "Understood, moving on.",
+  "Your feedback has been logged.",
+  "Input acknowledged.",
+  "Thank you, moving to the next step.",
+  "Your response has been registered.",
+  "Recorded successfully."
 ];
 const chatStartEnd = ["Do you need assistance with property matters? I’m here to help you. Let’s begin by getting to know each other so I can better understand your needs.", "Thanks for sharing your details. Based on your responses, I’ll prepare a list of properties that best suit your needs. Generating your PDF report now."]
+let conversationState = "normal"
+const apiUrl = "http://127.0.0.1:8000"
 const chatbot = () => {
     const outerContainer = document.createElement("div");
     outerContainer.id = 'chatbot-container';
@@ -74,6 +60,10 @@ const chatbot = () => {
     inputarea.classList.add("input-sec");
     outerInput.appendChild(inputarea);
 
+
+
+
+
     window.addEventListener("click", (event) => {
         if (event.target.className == 'input-sec') {
             outerInput.style.boxShadow = `rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset`;
@@ -95,11 +85,10 @@ const chatbot = () => {
     if (sessionId) {
         headers["session-id"] = sessionId;
     }
-    headers["api-key"] = apiUserKey;
     let storedList = [];
     let QuestionProgress = 0;
     let lengthOfQUestions = 0;
-    safeFetch("https://chatbotapi-b3wc.onrender.com/questions", {
+    safeFetch(`${apiUrl}/questions`, {
             method: "GET",
             headers: headers
         },chatarea,inputarea,inputButton).then(questions => {
@@ -119,7 +108,6 @@ const chatbot = () => {
         addBotmessage(chatStartEnd[0], chatarea,1000,inputarea,inputButton).then(() => {
             addBotmessage(storedList[0]["text"], chatarea, 1000,inputarea,inputButton)
             setTimeout(() => {
-
                 inputarea.type = storedList[0]["type"]
                 inputarea.name = storedList[0]["name"]
                 inputarea.placeholder = `Please input your ${storedList[0]["name"].toLowerCase()}`
@@ -133,7 +121,7 @@ const chatbot = () => {
 
 
 
-    let conversationState = "normal"
+
     let pendingCityOptions = [];
 
 
@@ -152,12 +140,11 @@ const chatbot = () => {
         if(conversationState === "need_otp")
         {
             
-            safeFetch("https://chatbotapi-b3wc.onrender.com/validateOtp",{
+            safeFetch(`${apiUrl}/validateOtp`,{
                 method: "GET",
                 headers:{
                     "session-id":localStorage.getItem("session_id"),
-                    "otp":userAnswer,
-                    "api-key":apiUserKey
+                    "otp":userAnswer
                 }
             },chatarea,inputarea,inputButton).then(data =>{
                 if (data["status"])
@@ -172,17 +159,18 @@ const chatbot = () => {
 
                 }else{
                     addBotmessage("❌ Invalid OTP , please try again",chatarea,2000,inputarea,inputButton)
+                    inputarea.value = ""
+                    inputarea.focus();
                 }
             });
             return;
         }
         if(conversationState == "need_Discount"){
             pendingCityOptions.push(userAnswer);
-            safeFetch("https://chatbotapi-b3wc.onrender.com/save-answer",{
+            safeFetch(`${apiUrl}/save-answer`,{
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        "api-key":apiUserKey
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         session_id: localStorage.getItem("session_id"),
@@ -200,23 +188,16 @@ const chatbot = () => {
 
         addUsermessage(userAnswer, chatarea);
         inputarea.value = ""
-
-          if (currentField === "name") {
-                if (!isValidName(userAnswer)) {
-                    addBotmessage("❌ Please enter a valid name (only alphabets, min 2 characters).", chatarea,500,inputarea,inputButton);
-                    return;
-                }
-            }
-
             if (currentField === "phone" && conversationState == "normal") {
                 if (!isValidPhone(userAnswer)) {
                     addBotmessage("📞 Please enter a valid 10-digit phone number.", chatarea,500,inputarea,inputButton);
                     return;
                 }
-                safeFetch("https://chatbotapi-b3wc.onrender.com/otpgen" ,
+                sessionStorage.setItem("phone",userAnswer);
+                safeFetch(`${apiUrl}/otpgen` ,
                     {
                         method: "POST",
-                        headers:{"Content-Type" : "application/json","api-key":apiUserKey},
+                        headers:{"Content-Type" : "application/json"},
                         body:JSON.stringify({
                             "session_id" : localStorage.getItem("session_id"),
                             "phone" : userAnswer
@@ -225,15 +206,16 @@ const chatbot = () => {
                 ).then(data => {
                     if(data["status"] != true){
                     console.log(data)
-                    addBotmessage(`We have sent an otp to ${userAnswer}.Please enter it below `,chatarea,2000,inputarea,inputButton);
+                    addBotmessage(`We have sent an otp to ${userAnswer}.Please enter it below `,chatarea,2000,inputarea,inputButton).then(()=>{
+                        changeEmailPhone(["Resend OTP",`${currentField == "email" ? "Change Email" : "Change Phone"}`],chatarea,inputarea,inputButton,storedList,currentField)
+                    });
                     inputarea.value = "";
+                    inputarea.placeholder = "please enter the otp"
                     inputarea.focus();
                     conversationState = "need_otp";
                     }else{
                     conversationState = "normal";
-                    addBotmessage("✅ Phone already verified. Skipping OTP.", chatarea, 1000,inputarea,inputButton).then(()=>{
-                        addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
-                    })
+                    addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
                     }
                 })
                 return;
@@ -244,10 +226,11 @@ const chatbot = () => {
                     addBotmessage("✉️ Please enter a valid email address.", chatarea,500,inputarea,inputButton);
                     return;
                 }
-                safeFetch("https://chatbotapi-b3wc.onrender.com/otpgen" ,
+                sessionStorage.setItem("email",userAnswer);
+                safeFetch(`${apiUrl}/otpgen` ,
                     {
                         method: "POST",
-                        headers:{"Content-Type" : "application/json","api-key":apiUserKey},
+                        headers:{"Content-Type" : "application/json"},
                         body:JSON.stringify({
                             "session_id" : localStorage.getItem("session_id"),
                             "email" : userAnswer
@@ -256,15 +239,16 @@ const chatbot = () => {
                 ).then(data => {
                     if(data["status"] != true){
                     console.log(data)
-                    addBotmessage(`We have sent an otp to ${userAnswer}.Please enter it below `,chatarea,2000,inputarea,inputButton);
+                    addBotmessage(`We have sent an otp to ${userAnswer}.Please enter it below `,chatarea,2000,inputarea,inputButton).then(()=>{
+                        changeEmailPhone(["Resend OTP",`${currentField == "email" ? "Change Email" : "Change Phone"}`],chatarea,inputarea,inputButton,storedList,currentField)
+                    })
                     inputarea.value = "";
+                    inputarea.placeholder = "please enter the otp"
                     inputarea.focus();
                     conversationState = "need_otp";
                     }else{
                     conversationState = "normal";
-                    addBotmessage("✅ email already verified. Skipping OTP.", chatarea, 1000,inputarea,inputButton).then(()=>{
-                        addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
-                    })
+                    addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
                     }
 
                 })
@@ -291,7 +275,6 @@ const chatbot = () => {
 
             if (currentField === "onetimesettlement"){
                 if (userAnswer.toLowerCase() === "yes"){
-                    console.log("hii i am here")
                   pendingCityOptions.push(userAnswer);
                   conversationState = "need_Discount";
                   addBotmessage("Please Do select a Dicount percent you want ?",chatarea,2000,inputarea,inputButton).then(()=>{
@@ -305,16 +288,15 @@ const chatbot = () => {
             }
 
             if(storedList[sessionStorage.getItem("progress")]["name"] != null && conversationState == "normal") {
-                safeFetch("https://chatbotapi-b3wc.onrender.com/save-answer", {
+                safeFetch(`${apiUrl}/save-answer`, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        "api-key":apiUserKey
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         session_id: localStorage.getItem("session_id"),
                         name: storedList[sessionStorage.getItem("progress")]["name"],
-                        answer: inputarea.value
+                        answer: userAnswer
                     })
                 },chatarea,inputarea,inputButton).then(data => {
 
@@ -327,11 +309,10 @@ const chatbot = () => {
                             matchflag = true;
                         }});
                         if (matchflag) {
-                        safeFetch("https://chatbotapi-b3wc.onrender.com/save-answer", {
+                        safeFetch(`${apiUrl}/save-answer`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",
-                            "api-key":apiUserKey
+                            "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
                             session_id: localStorage.getItem("session_id"),
@@ -343,11 +324,10 @@ const chatbot = () => {
                         pendingCityOptions = []
                         addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton);
                 } else {
-                    safeFetch("https://chatbotapi-b3wc.onrender.com/rapidfuzzy", {
+                    safeFetch(`${apiUrl}/rapidfuzzy`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",
-                            "api-key":apiUserKey
+                            "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
                             "locations": userAnswer,
@@ -375,7 +355,6 @@ const chatbot = () => {
                 }
 
                 }else{
-
                     if (document.getElementById("remove-Budget")) {
                         document.getElementById("remove-Budget").remove();
                     }
@@ -488,11 +467,6 @@ const addtypingAnimation = () => {
 }
 
 
-function isValidName(name) {
-    // Only alphabets and spaces, min 2 chars
-    return /^(?!.*([A-Za-z\s])\1\1)[A-Za-z\s]{2,}$/.test(name);
-}
-
 function isValidPhone(phone) {
     // 10 digit Indian mobile numbers
     return /^[6-9]\d{9}$/.test(phone);
@@ -578,7 +552,12 @@ const resetEverything = (chatarea)=>{
     chatbot();
 }
 
+
 function addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton){
+    const removeChange = document.getElementById("remove-change");
+if(removeChange){
+    removeChange.remove();
+}
     inputarea.value = "";
     let QuestionProgress = parseInt(sessionStorage.getItem("progress"))
     QuestionProgress = QuestionProgress + 1;
@@ -586,13 +565,13 @@ function addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton){
     let lengthOfQUestions = storedList.length;
     console.log(sessionStorage.getItem("progress"));
      if (parseInt(sessionStorage.getItem("progress")) === lengthOfQUestions) {
-        addBotmessage(chatStartEnd[1], chatarea, 2000,inputarea,inputButton).then(()=>{
+        addBotmessage(chatStartEnd[1], chatarea, 2000).then(()=>{
             inputarea.style = "none"
         })
     }else{
         if ((storedList[sessionStorage.getItem("progress")]["options"])) {
             let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
-            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000,inputarea,inputButton).then(() => {
+            addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
                 addOptions(storedList[sessionStorage.getItem("progress")]["options"], chatarea, inputarea, inputButton);
             })
             inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
@@ -603,18 +582,18 @@ function addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton){
             }else if(storedList[parseInt(sessionStorage.getItem("progress"))]["name"] === "Budget"){
                 outerInput.style.display = "grid";
                 let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
-                addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000,inputarea,inputButton).then(() => {
+                addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
                 addbudgetslidebar(chatarea, inputarea ,50000 , 20000000 , 500000 , [50000,6550000],"₹");
                 })
             }else if(storedList[parseInt(sessionStorage.getItem("progress"))]["name"] === "squareft"){
                 outerInput.style.display = "grid";
                 let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
-                addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000,inputarea,inputButton).then(() => {
+                addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000).then(() => {
                 addbudgetslidebar(chatarea, inputarea ,100 , 10100 , 500 , [600,1600],"sqrft ");
                 })
             }
             else if(storedList[parseInt(sessionStorage.getItem("progress"))]["name"] === "Phone"){
-                addBotmessage(`Right !! Moving Forward To Next Question.\n${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000,inputarea,inputButton)
+                addBotmessage(`Right !! Moving Forward To Next Question.\n${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
                 inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
                 inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
                 storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "null";
@@ -625,7 +604,7 @@ function addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton){
             else{
                 outerInput.style.display = "grid"
                 let randack = acknowledgements[Math.floor(Math.random() * acknowledgements.length)];
-                addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000,inputarea,inputButton)
+                addBotmessage(`${randack}.\n ${storedList[sessionStorage.getItem("progress")]["text"]}`, chatarea, 1000)
                 inputarea.type = storedList[sessionStorage.getItem("progress")]["type"]
                 inputarea.name = storedList[sessionStorage.getItem("progress")]["name"] ?
                 storedList[sessionStorage.getItem("progress")]["name"].toLowerCase() : "null";
@@ -639,34 +618,66 @@ function addnextQuestion(inputarea,chatarea,outerInput,storedList,inputButton){
 
 }
 
-// chatbot();
-// chatbot();
 
-// making it just an small icon in the page:
-// let bot = document.createElement("div")
-// bot.id = "float-bot";
-// let botImage = document.createElement("img");
-// botImage.src = `./images/bot-float.png`
-// botImage.setAttribute("class","bot-image");
-// bot.appendChild(botImage);
-// document.body.append(bot);
-// let counter = 0;
-// bot.addEventListener("click",()=>{
-// let botOuter = document.getElementById("chatbot-container");
-// console.log(counter)
-//     if(counter == 0){
+const changeEmailPhone = (optionsarray,chatarea,inputarea,inputButton,storedList,currentField) =>{
+    let outerdiv = document.createElement("div");
+    outerdiv.classList.add("options-out");
+    outerdiv.id = "remove-change"
 
-//         botOuter.style.display = "grid"
-//         counter++;
-//     }
-//     else if(counter == 1){  
-//         botOuter.style.display = "None"
-//         counter--;
-//     }
-// })
+    optionsarray.forEach(element => {
 
+        let spanele = document.createElement("span");
+        spanele.innerText = element;
+        spanele.classList.add("bot-options");
 
-// create floating bot icon
+        spanele.addEventListener("click", () => {
+            const choice = spanele.innerText;
+            switch(choice){
+                case "Change Email":
+                    sessionStorage.setItem("progress",parseInt(storedList.findIndex((question)=>{
+                       return question.name == "Email"
+                    })))
+                    conversationState = "normal"
+                    addBotmessage("Please Enter the new Email Address",chatarea,500,inputarea,inputButton);
+                    inputarea.placeholder = "Enter new mail address";
+                    outerdiv.remove();
+                    return;
+                case "Change Phone":
+                    sessionStorage.setItem("progress",parseInt(storedList.findIndex((question)=>{
+                        return question.name == "Phone"
+                    })))
+                    conversationState = "normal"
+                    addBotmessage("Please Enter the new Phone Number",chatarea,500,inputarea,inputButton);
+                    inputarea.placeholder = "Enter new Phone Number";
+                    outerdiv.remove();
+                    return;
+                case "Resend OTP":
+                    safeFetch(`${apiUrl}/otpgen`,{
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            session_id: localStorage.getItem("session_id"),
+                            [currentField]:sessionStorage.getItem(currentField)
+                        })
+
+                    }).then(()=>{
+                        addBotmessage("🔄 OTP has been resent, please check again!", chatarea);
+                        inputarea.placeholder = "Enter the new otp."
+                     });
+                    return;           
+            }
+        })
+
+        outerdiv.appendChild(spanele);
+    });
+
+    chatarea.appendChild(outerdiv);
+    outerdiv.scrollIntoView({
+        behavior: "smooth"
+    });
+    
+}
+
 let bot = document.createElement("div");
 bot.id = "float-bot";
 let botImage = document.createElement("img");
